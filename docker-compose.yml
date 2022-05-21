@@ -1,6 +1,28 @@
 version: "3.8"
 services:
+  java-build-service:
+    image: maven:3.8.5-jdk-8
+    command: >
+      sh -c "touch /usr/src/app/${LOCK_FNAME} &&
+             rm -rf /usr/src/app/target &&
+             mvn ${MVN_OPT} -f /usr/src/app/pom.xml clean package &&
+             rm -f /usr/src/app/${LOCK_FNAME}"
+    volumes:
+      - ./app:/usr/src/app
+      - maven-repo-volume:/root/.m2
   java-app-server:
-    build: .
+    build: ./launcher
+    depends_on:
+      - java-build-service
+    volumes:
+      - ./app:/usr/app
+    environment:
+      - APP=${APP_NAME}
+      - WAIT=${WAIT_SEC}
+      - BUILD_WAIT=${BUILD_WAIT_SEC}
+      - LOCK=${LOCK_FNAME}
     ports:
       - "8888:8080"
+    stop_grace_period: 1s
+volumes:
+  maven-repo-volume:
