@@ -63,7 +63,7 @@ public class StudentService {
     }
     
     // https://www.baeldung.com/transaction-configuration-with-jpa-and-spring
-    @Transactional
+    @Transactional(timeout = 10)
     public void updateStudent(UUID id, String name, String email) {
         Student result = studentRepository.findById(id)
                 .orElseThrow(() -> new IllegalStudentIdStateException(String.format(INVALID_ID_MESSAGE, id)));

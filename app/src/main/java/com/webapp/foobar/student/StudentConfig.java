@@ -44,7 +44,7 @@ public class StudentConfig {
                     add(new Student("kanita", "viranond9@gmail.com", LocalDate.of(1981, Month.JULY, 8)));
                     add(new Student("kanita", "viranond10@gmail.com", LocalDate.of(1981, Month.JULY, 8)));
                     add(new Student("kanita", "viranond11@gmail.com", LocalDate.of(1981, Month.JULY, 8)));
-                    add(new Student("kanita", "viranond12@gmail.com", LocalDate.of(1981, Month.JULY, 8)));
+                    add(new Student("kanita", "viranond12@gmail.com"));
 
                 }
             };

@@ -10,8 +10,8 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -27,8 +27,8 @@ public interface StudentRepository extends JpaRepository<Student,UUID> {
 
     // This query is not required, but helpful to know the JBQL
     // Student is Student.class
-    @Query("SELECT s FROM Student s WHERE s.email = ?1")
-    public Optional<Student> findStudentByEmail(String email);
+    @Query("SELECT s FROM Student s WHERE s.email = :email")
+    public Optional<Student> findStudentByEmail(@Param("email") String email);
     
 //    public Optional<Student> findStudentById(UUID uuid);
     
