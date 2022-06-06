@@ -6,11 +6,11 @@ package com.webapp.foobar.student;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -22,18 +22,12 @@ import javax.persistence.Transient;
 @Entity
 @Table
 public class Student {
-    // required for JPA for Pimrary Key
+    // required for JPA for Primary Key
+    // https://tomharrisonjr.com/uuid-or-guid-as-primary-keys-be-careful-7b2aa3dcb439
     @Id
-    @SequenceGenerator(
-            name = "student_sequence",
-            sequenceName = "student_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "student_sequence"
-    )  
-    private Long id;
+    @GeneratedValue
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID id;
 
     private String name;
     private String email;
@@ -49,24 +43,15 @@ public class Student {
         this.email = email;
         this.dob = dob;
     }
-    
 
-    public Student(Long id, String name, String email, LocalDate dob) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.dob = dob;
-    }
-
-    
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
-
+    
     public String getName() {
         return name;
     }

@@ -4,22 +4,31 @@
  */
 package com.webapp.foobar.student;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author bonobo
+ * https://www.baeldung.com/transaction-configuration-with-jpa-and-spring
  */
 @Service
 public class StudentService {
-    private static final String INVALID_ID_MESSAGE = "student id:%d not found";    
-    private static final String INVALID_EMAIL_MESSAGE = "email:%s invalid";
+    private static final String INVALID_ID_MESSAGE = "student id: %s not found";    
+    private static final String INVALID_EMAIL_MESSAGE = "email: %s invalid";
 
+    private static final Log logger = LogFactory.getLog(StudentService.class);
+    
     @Autowired
     private StudentRepository studentRepository;
     
@@ -39,7 +48,7 @@ public class StudentService {
 //                ));
         return studentRepository.findAll();
     }
-
+    
     public void addNewStudent(Student student) {
         Optional<Student> result = 
                 studentRepository.findStudentByEmail(student.getEmail());
@@ -47,17 +56,15 @@ public class StudentService {
         studentRepository.save(student);
     }
 
-    public void deleteStudent(Long id) {
-//        Student result = studentRepository.findById(id).orElseThrow(() -> new IllegalStateException());
-        if(!studentRepository.existsById(id)) {
-            throw new IllegalStudentIdStateException(String.format(INVALID_ID_MESSAGE, id));
-        }
-        studentRepository.deleteById(id);
+    public void deleteStudent(UUID id) {
+        Student result = studentRepository.findById(id)
+                .orElseThrow(() -> new IllegalStudentIdStateException(String.format(INVALID_ID_MESSAGE, id)));
+        studentRepository.delete(result);
     }
     
-    
+    // https://www.baeldung.com/transaction-configuration-with-jpa-and-spring
     @Transactional
-    public void updateStudent(Long id, String name, String email) {
+    public void updateStudent(UUID id, String name, String email) {
         Student result = studentRepository.findById(id)
                 .orElseThrow(() -> new IllegalStudentIdStateException(String.format(INVALID_ID_MESSAGE, id)));
         if (name != null && name.length() > 0 && 
@@ -71,7 +78,22 @@ public class StudentService {
             result.setEmail(email);
         }
     }
+
+    public Page<Student> findAllStudents(Pageable pageable) {
+        return studentRepository.findAll(pageable);
+    }
     
+    public Page<Student> getStudentsByDob(LocalDate dob, Pageable pageable) {
+        return studentRepository.findStudentByDob(dob, pageable);
+    }
+
+    public Student findById(UUID id) {
+        logger.debug("findById:" + id + " uuid:" + (id instanceof UUID));
+        Student result = studentRepository.findById(id)
+                .orElseThrow(() -> new IllegalStudentIdStateException(String.format(INVALID_ID_MESSAGE, id.toString())));
+        return result;
+    }
+
     public static final class IllegalStudentIdStateException extends IllegalStateException {
         public IllegalStudentIdStateException(String message) { super(message); }
     }
